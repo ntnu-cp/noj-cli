@@ -17,3 +17,14 @@ class User:
         self.md5 = md5
         self.role = role
         self.displayed_name = displayed_name or displayedName
+
+    def to_dict(self):
+        return {
+            k: getattr(self, k)
+            for k in (
+                'username',
+                'md5',
+                'role',
+                'displayed_name',
+            )
+        }
