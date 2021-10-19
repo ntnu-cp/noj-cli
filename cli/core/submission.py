@@ -55,6 +55,17 @@ class Submission:
     def __str__(self) -> str:
         return f'Submission [{self.id}]'
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user': self.user.to_dict(),
+            'status': self.status,
+            'run_time': self.run_time,
+            'memory_usage': self.memory_usage,
+            'score': self.score,
+            'problem_id': self.problem_id,
+        }
+
     @classmethod
     def load_payload(cls, p: Dict[str, Any]) -> 'Submission':
         return cls(
