@@ -55,6 +55,17 @@ class Submission:
     def __str__(self) -> str:
         return f'Submission [{self.id}]'
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user': self.user.to_dict(),
+            'status': self.status,
+            'run_time': self.run_time,
+            'memory_usage': self.memory_usage,
+            'score': self.score,
+            'problem_id': self.problem_id,
+        }
+
     @classmethod
     def load_payload(cls, p: Dict[str, Any]) -> 'Submission':
         return cls(
@@ -79,7 +90,11 @@ class Submission:
         return cls.load_payload(resp.json()['data'])
 
     @classmethod
-    def filter(cls, problem_id: int) -> List['Submission']:
+    def filter(
+            cls,
+            problem_id: int,
+            before: Optional[datetime] = None,
+    ) -> List['Submission']:
         '''
         Get submission by parameter
         '''
@@ -92,7 +107,10 @@ class Submission:
                     'problemId': problem_id,
                 },
             ).json()['data']['submissions']
-        return [cls.load_payload(s) for s in submissions]
+        submissions = map(cls.load_payload, submissions)
+        if before is not None:
+            submissions = filter(lambda s: s.created <= before, submissions)
+        return list(submissions)
 
     def rejudge(
         self,
