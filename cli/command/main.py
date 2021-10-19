@@ -234,18 +234,25 @@ def rejudge(
     default=['id'],
     multiple=True,
 )
+@click.option(
+    '-b',
+    '--before',
+)
 def submission(
     pid: Tuple[int],
     output: Optional[pathlib.Path],
     field: Tuple[int],
+    before: Optional[str],
 ):
     def filter(s: Submission):
         s = s.to_dict()
         return {f: s[f] for f in field}
 
+    if before is not None:
+        before = datetime.fromisoformat(before)
     submissions = []
     for i in pid:
-        submissions.extend(map(filter, Submission.filter(i)))
+        submissions.extend(map(filter, Submission.filter(i, before)))
     if output is None:
         output = sys.stdout
     else:
