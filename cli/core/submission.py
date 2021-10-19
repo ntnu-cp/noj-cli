@@ -90,7 +90,11 @@ class Submission:
         return cls.load_payload(resp.json()['data'])
 
     @classmethod
-    def filter(cls, problem_id: int) -> List['Submission']:
+    def filter(
+            cls,
+            problem_id: int,
+            before: Optional[datetime] = None,
+    ) -> List['Submission']:
         '''
         Get submission by parameter
         '''
@@ -103,7 +107,10 @@ class Submission:
                     'problemId': problem_id,
                 },
             ).json()['data']['submissions']
-        return [cls.load_payload(s) for s in submissions]
+        submissions = map(cls.load_payload, submissions)
+        if before is not None:
+            submissions = filter(lambda s: s.created <= before, submissions)
+        return list(submissions)
 
     def rejudge(
         self,
