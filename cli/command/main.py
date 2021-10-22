@@ -18,18 +18,8 @@ from cli.core import (
     Homework,
 )
 from cli.core import util
+from cli.command.noj import noj
 import click
-
-
-@click.group()
-@click.option(
-    '--debug',
-    help='Enable debug',
-    is_flag=True,
-)
-def noj(debug: bool):
-    if debug:
-        logging.basicConfig(level=logging.DEBUG)
 
 
 @noj.command()
