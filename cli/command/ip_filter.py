@@ -60,6 +60,23 @@ def add(*args, **ks):
 
 @ip_filter.command()
 @click.option('-i', '--id', help='Homework ID')
+@click.option('-n', '--name', help='Homework name')
+@click.option(
+    '-c',
+    '--course',
+    help='Course name, should be provided with -n/--name option',
+    required=True,
+)
+@click.argument('ip')
+def delete(*args, **ks):
+    '''
+    Remove IP filter from homework
+    '''
+    patch(*args, **ks, op='del')
+
+
+@ip_filter.command()
+@click.option('-i', '--id', help='Homework ID')
 @click.option('-n', '--name', help='Homework\'s name')
 @click.option(
     '-c',
