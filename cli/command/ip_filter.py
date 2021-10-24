@@ -14,25 +14,13 @@ def ip_filter():
     pass
 
 
-@ip_filter.command()
-@click.option('-i', '--id', help='Homework ID')
-@click.option('-n', '--name', help='Homework name')
-@click.option(
-    '-c',
-    '--course',
-    help='Course name, should be provided with -n/--name option',
-    required=True,
-)
-@click.argument('ip')
-def add(
+def patch(
+    op: str,
     ip: str,
     course: str,
     id: Optional[str],
     name: Optional[str],
 ):
-    '''
-    Add IP filter to homework
-    '''
     if id is not None:
         hw = Homework.get_by_id(id)
     elif name is not None:
@@ -44,13 +32,30 @@ def add(
         resp = sess.patch(
             url,
             json={'patches': [{
-                'op': 'add',
+                'op': op,
                 'value': ip,
             }]},
         )
         logging.debug(resp.text)
         if resp.status_code != 200:
             exit(1)
+
+
+@ip_filter.command()
+@click.option('-i', '--id', help='Homework ID')
+@click.option('-n', '--name', help='Homework name')
+@click.option(
+    '-c',
+    '--course',
+    help='Course name, should be provided with -n/--name option',
+    required=True,
+)
+@click.argument('ip')
+def add(*args, **ks):
+    '''
+    Add IP filter to homework
+    '''
+    patch(*args, **ks, op='add')
 
 
 @ip_filter.command()
