@@ -6,6 +6,11 @@ from .config import Config
 
 
 class Homework:
+    class NotFound(Exception):
+        '''
+        Can not find a homework
+        '''
+
     def __init__(
             self,
             _id: str,
@@ -34,9 +39,33 @@ class Homework:
             try:
                 hw = next(hw for hw in hws if hw['name'] == name)
             except StopIteration:
-                raise ValueError(f'Homework {course}/{name} not found.')
+                raise cls.NotFound(
+                    f'Homework not found. [course={course}, name={name}]')
         return cls(
             _id=hw['id'],
+            name=hw['name'],
+            start=hw['start'],
+            end=hw['end'],
+            problem_ids=hw['problemIds'],
+            student_status=hw['studentStatus'],
+        )
+
+    @classmethod
+    def get_by_id(
+        cls,
+        id: str,
+    ):
+        '''
+        Get single homework by id
+        '''
+        with logined_session() as sess:
+            url = f'{Config.API_BASE}/homework/{id}'
+            resp = sess.get(url)
+            if resp.status_code == 404:
+                raise cls.NotFound(f'Homework not found. [id={id}]')
+            hw = resp.json()['data']
+        return cls(
+            _id=id,
             name=hw['name'],
             start=hw['start'],
             end=hw['end'],
