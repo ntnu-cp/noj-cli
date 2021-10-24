@@ -64,6 +64,7 @@ class Submission:
             'memory_usage': self.memory_usage,
             'score': self.score,
             'problem_id': self.problem_id,
+            'code': self.code,
         }
 
     @classmethod
@@ -80,6 +81,7 @@ class Submission:
             status=p['status'],
             language_type=p['languageType'],
             tasks=p['tasks'],
+            code=p.get('code'),
         )
 
     @classmethod
