@@ -20,7 +20,11 @@ def submission():
 @submission.command()
 @click.option('-i', '--id')
 def get(id):
-    print(Submission.get_by_id(id).to_dict())
+    '''
+    Get single submission by id
+    '''
+    output = Submission.get_by_id(id).to_dict()
+    print(json.dumps(output))
 
 
 @submission.command()
