@@ -2,6 +2,7 @@ import click
 import logging
 
 from .submission import submission
+from .ip_filter import ip_filter
 
 
 @click.group()
@@ -16,3 +17,4 @@ def noj(debug: bool):
 
 
 noj.add_command(submission)
+noj.add_command(ip_filter)
