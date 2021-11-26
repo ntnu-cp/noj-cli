@@ -12,9 +12,9 @@ class MultiDeadLinePolicy:
     '''
     class ProblemStat:
         def __init__(
-                self,
-                pid: int,
-                deadlines: List[Tuple[datetime, int]],
+            self,
+            pid: int,
+            deadlines: List[Tuple[datetime, int]],
         ) -> None:
             self.pid = pid
             # Sort by time
@@ -45,12 +45,12 @@ class MultiDeadLinePolicy:
             return f'{cls_name}({self.pid}, {score_infos})'
 
     def __init__(
-            self,
-            submissions: List[Submission],
-            students: List[str] = None,
-            weights: Optional[Dict[int, int]] = None,
-            deadlines: Optional[List[Tuple[datetime, int]]] = None,
-            excludes: Optional[List[str]] = None,
+        self,
+        submissions: List[Submission],
+        students: List[str] = None,
+        weights: Optional[Dict[int, int]] = None,
+        deadlines: List[Tuple[datetime, int]] = [],
+        excludes: Optional[List[str]] = None,
     ) -> None:
         if len(submissions) == 0:
             raise ValueError('Empty submissions')
@@ -63,7 +63,7 @@ class MultiDeadLinePolicy:
             students -= {*excludes}
             students = [*students]
         self.students = students
-        if deadlines is None:
+        if len(deadlines) == 0:
             deadlines = [(datetime.max, 100)]
         self.deadlines = deadlines
         # If not specified
