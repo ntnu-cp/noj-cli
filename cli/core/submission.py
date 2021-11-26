@@ -23,19 +23,19 @@ class Submission:
 
     # TODO: use Enum to define status
     def __init__(
-            self,
-            _id: str,
-            user: Union[User, Dict[str, Any]],
-            last_send: float,
-            created: float,
-            memory_usage: int,
-            problem_id: int,
-            run_time: int,
-            score: int,
-            status: int,
-            language_type: Union[LanguageType, int],
-            tasks: List[List[Any]],
-            code: Optional[str] = None,
+        self,
+        _id: str,
+        user: Union[User, Dict[str, Any]],
+        last_send: float,
+        created: float,
+        memory_usage: int,
+        problem_id: int,
+        run_time: int,
+        score: int,
+        status: int,
+        language_type: Union[LanguageType, int],
+        tasks: List[List[Any]],
+        code: Optional[str] = None,
     ) -> None:
         self.id = _id
         self.last_send = datetime.fromtimestamp(last_send)
@@ -65,6 +65,7 @@ class Submission:
             'score': self.score,
             'problem_id': self.problem_id,
             'code': self.code,
+            'last_send': self.last_send.isoformat(),
         }
 
     @classmethod
@@ -93,21 +94,29 @@ class Submission:
 
     @classmethod
     def filter(
-            cls,
-            problem_id: int,
-            before: Optional[datetime] = None,
+        cls,
+        course: Optional[str] = None,
+        tags: List[str] = [],
+        problem_id: Optional[int] = None,
+        before: Optional[datetime] = None,
     ) -> List['Submission']:
         '''
         Get submission by parameter
         '''
+        params = {
+            'offset': 0,
+            'count': -1,
+        }
+        if course is not None:
+            params['course'] = course
+        if problem_id is not None:
+            params['problemId'] = problem_id
+        if len(tags):
+            params['tags'] = ','.join(tags)
         with logined_session() as sess:
             submissions = sess.get(
                 f'{Config.API_BASE}/submission',
-                params={
-                    'offset': 0,
-                    'count': -1,
-                    'problemId': problem_id,
-                },
+                params=params,
             ).json()['data']['submissions']
         submissions = map(cls.load_payload, submissions)
         if before is not None:
