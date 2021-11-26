@@ -2,6 +2,7 @@ import click
 import pathlib
 import json
 import sys
+from functools import partial
 from datetime import datetime
 from typing import (
     Tuple,
@@ -33,7 +34,17 @@ def get(id):
     '--pid',
     type=int,
     multiple=True,
-    required=True,
+)
+@click.option(
+    '-t',
+    '--tag',
+    type=str,
+    multiple=True,
+)
+@click.option(
+    '-c',
+    '--course',
+    type=str,
 )
 @click.option(
     '-o',
@@ -57,19 +68,35 @@ def get_list(
     output: Optional[pathlib.Path],
     field: Tuple[int],
     before: Optional[str],
+    tag: Tuple[str],
+    course: Optional[str],
 ):
     '''
     Get submission list
     '''
-    def filter(s: Submission):
+    if len(pid) == 0 and len(tag) == 0:
+        print('Either pid or tag must be given')
+        exit(1)
+    if before is not None:
+        before = datetime.fromisoformat(before)
+
+    def _filter(s: Submission):
         s = s.to_dict()
         return {f: s[f] for f in field}
 
-    if before is not None:
-        before = datetime.fromisoformat(before)
-    submissions = []
+    _submission_filter = partial(
+        Submission.filter,
+        course=course,
+        before=before,
+    )
+    submission_filter = lambda *args, **ks: map(
+        _filter,
+        _submission_filter(*args, **ks),
+    )
+
+    submissions = [*submission_filter(tags=tag)]
     for i in pid:
-        submissions.extend(map(filter, Submission.filter(i, before)))
+        submissions.extend(submission_filter(problem_id=i))
     if output is None:
         output = sys.stdout
     else:

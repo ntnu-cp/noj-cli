@@ -87,7 +87,7 @@ def grade(
         # Use homework's problems
         pid = homework.problem_ids
         # Use homework deadline if not given
-        if deadline is None:
+        if len(deadline) == 0:
             deadline = f'{homework.end.isoformat()},100'
     else:
         # Use policy default
@@ -104,7 +104,7 @@ def grade(
     else:
         weight = None
     # Convert deadlines
-    if deadline is not None:
+    if len(deadline) != 0:
         deadline = [d.split(',') for d in deadline]
         if any(len(d) != 2 for d in deadline):
             raise ValueError('Invalid deadline format.')
@@ -131,7 +131,7 @@ def grade(
         logging.debug(f'Weights: {weight}')
     logging.debug(f'Deadline: {deadline}')
     logging.debug(f'Exclude list: {exclude}')
-    submissions = [*chain(*(Submission.filter(i) for i in pid))]
+    submissions = [*chain(*(Submission.filter(problem_id=i) for i in pid))]
     policy = MultiDeadLinePolicy(
         submissions,
         students=students,
