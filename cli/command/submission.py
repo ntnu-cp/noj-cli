@@ -94,7 +94,9 @@ def get_list(
         _submission_filter(*args, **ks),
     )
 
-    submissions = [*submission_filter(tags=tag)]
+    submissions = []
+    if tag:
+        submissions.extend(submission_filter(tags=tag))
     for i in pid:
         submissions.extend(submission_filter(problem_id=i))
     if output is None:
