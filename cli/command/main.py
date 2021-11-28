@@ -88,7 +88,7 @@ def grade(
         pid = homework.problem_ids
         # Use homework deadline if not given
         if len(deadline) == 0:
-            deadline = f'{homework.end.isoformat()},100'
+            deadline = [f'{homework.end.isoformat()},100']
     else:
         # Use policy default
         students = None
@@ -107,6 +107,7 @@ def grade(
     if len(deadline) != 0:
         deadline = [d.split(',') for d in deadline]
         if any(len(d) != 2 for d in deadline):
+            logging.debug(f'Got deadline: {deadline}')
             raise ValueError('Invalid deadline format.')
         deadline = [(
             datetime.fromisoformat(d[0]),
