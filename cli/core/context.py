@@ -2,6 +2,7 @@ from typing import Dict
 
 
 class Context:
+
     def __init__(self, key: str) -> None:
         from .config import Config
         try:

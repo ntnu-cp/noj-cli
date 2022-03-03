@@ -6,19 +6,20 @@ from .config import Config
 
 
 class Homework:
+
     class NotFound(Exception):
         '''
         Can not find a homework
         '''
 
     def __init__(
-            self,
-            _id: str,
-            name: str,
-            problem_ids: List[int],
-            start: int,
-            end: int,
-            student_status: Dict[str, Any],
+        self,
+        _id: str,
+        name: str,
+        problem_ids: List[int],
+        start: int,
+        end: int,
+        student_status: Dict[str, Any],
     ) -> None:
         self.id = _id
         self.name = name
@@ -74,8 +75,8 @@ class Homework:
         )
 
     def get_score(
-            self,
-            weights: Dict[int, int] = None,
+        self,
+        weights: Dict[int, int] = None,
     ) -> str:
         '''
         Return homework scores in csv format
