@@ -9,6 +9,7 @@ from typing import (
     Optional,
 )
 from cli.core import Submission
+from cli.core.submission import LanguageType
 
 __all__ = ('submission', )
 
@@ -104,3 +105,49 @@ def get_list(
     else:
         output = output.open('w')
     json.dump(submissions, output)
+
+
+@submission.command()
+@click.argument('problem', type=int)
+@click.option(
+    '--code',
+    type=str,
+    default='-',
+    help='Path to the source code.'
+    'Read from stdin if not given or its value is -',
+)
+@click.option(
+    '--lang',
+    type=int,
+    help='Submission language. Inferred from filename extension if not given',
+)
+def submit(
+    problem: int,
+    code: str,
+    lang: Optional[int],
+):
+    '''
+    Create a submission
+    '''
+    if lang is None:
+        if code == '-':
+            print('Must specify language if source file not provided')
+            exit(1)
+        if code.endswith('.c'):
+            lang = LanguageType.C
+        elif code.endswith('.cpp'):
+            lang = LanguageType.CPP
+        elif code.endswith('.py'):
+            lang = LanguageType.PY3
+        else:
+            print('Unknow file extension')
+            exit(1)
+    if code != '-':
+        code = pathlib.Path(code)
+    result = Submission.submit(
+        problem_id=problem,
+        lang=lang,
+        code_path=code,
+    )
+    if result == False:
+        exit(1)

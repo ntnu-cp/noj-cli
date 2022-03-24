@@ -10,7 +10,9 @@ class MultiDeadLinePolicy:
     '''
     Given submission and deadline-ratio tuple to generate scores
     '''
+
     class ProblemStat:
+
         def __init__(
             self,
             pid: int,
