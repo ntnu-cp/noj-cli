@@ -28,6 +28,16 @@ class Homework:
         self.start = datetime.fromtimestamp(start)
         self.end = datetime.fromtimestamp(end)
 
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'problem_ids': self.problem_ids,
+            'student_status': self.student_status,
+            'start': self.start.isoformat(),
+            'end': self.end.isoformat(),
+        }
+
     @classmethod
     def get_by_name(
         cls,

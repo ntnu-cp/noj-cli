@@ -191,7 +191,7 @@ def rejudge(
     for i in pid:
         logging.debug(f'Start rejudge problem {i}')
         # Get submissions by problem id
-        submissions = Submission.filter(i)
+        submissions = Submission.filter(problem_id=i)
         logging.debug(f'Found {len(submissions)} submissions')
         fails = []
         for chunk in util.chunker_list(submissions, 10):
