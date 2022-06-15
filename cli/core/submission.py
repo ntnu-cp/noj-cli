@@ -123,6 +123,7 @@ class Submission:
         problem_id: Optional[int] = None,
         before: Optional[datetime] = None,
         user: Optional[Union[str, User]] = None,
+        after: Optional[datetime] = None,
     ) -> List['Submission']:
         '''
         Get submission by parameter
@@ -142,14 +143,16 @@ class Submission:
                 params['username'] = user.username
         if len(tags):
             params['tags'] = ','.join(tags)
+        if before is not None:
+            params['before'] = int(before.timestamp())
+        if after is not None:
+            params['after'] = int(after.timestamp())
         with logined_session() as sess:
             submissions = sess.get(
                 f'{Config.API_BASE}/submission',
                 params=params,
             ).json()['data']['submissions']
         submissions = map(cls.load_payload, submissions)
-        if before is not None:
-            submissions = filter(lambda s: s.created <= before, submissions)
         return list(submissions)
 
     def rejudge(

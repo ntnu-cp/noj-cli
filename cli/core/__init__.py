@@ -4,6 +4,8 @@ from .context import Context
 from .grade import MultiDeadLinePolicy
 from .homework import Homework
 from .user import User
+from .problem import Problem
+from .course import Course
 
 __all__ = (
     Submission,
@@ -12,4 +14,6 @@ __all__ = (
     MultiDeadLinePolicy,
     Homework,
     User,
+    Problem,
+    Course,
 )

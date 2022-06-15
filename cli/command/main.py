@@ -38,10 +38,9 @@ import click
     ''',
 )
 @click.option(
-    '-d',
     '--deadline',
     help='''
-    Homework's deadline and score ratio. In format '<data>,<ratio>'.
+    Homework's deadline and score ratio. In format '<date>,<ratio>'.
     The date part will be parsed by python's `datetime.fromisoformat`.
     ratio is an integer in [0, 100]. If not pass, then first try to
     use homework's deadline with ratio 100, otherwise use `datetime.max`.
@@ -62,9 +61,12 @@ import click
     help='',
 )
 @click.option(
-    '-w',
     '--weight',
-    help='',
+    help=('Weights used to calculate scores.\n'
+          'Given in the format: <pid>=<ratio>.\n'
+          'e.g. 487=63 means that problem 487 has weight 63%.\n'
+          'You must set ratio for each problem of this query.\n'
+          'If this option is not set, the weights are equally distributed.\n'),
     multiple=True,
 )
 def grade(
@@ -205,39 +207,6 @@ def rejudge(
 
 
 # TODO: seperate this from main.py
-
-
-@noj.command()
-@click.option(
-    '-p',
-    '--pid',
-    type=int,
-    multiple=True,
-)
-def copycat(pid: Tuple[int]):
-    from cli.core.auth import logined_session
-    urls = {}
-    with logined_session() as sess:
-        for i in pid:
-            resp = sess.post(
-                f'{Config.API_BASE}/copycat',
-                json={
-                    'course': 'Computer-Programming-II',
-                    'problemId': i,
-                },
-            )
-            assert resp.ok, resp.text
-        for i in pid:
-            resp = sess.get(
-                f'{Config.API_BASE}/copycat',
-                params={
-                    'course': 'Computer-Programming-II',
-                    'problemId': i,
-                },
-            )
-            assert resp.ok, resp.text
-            urls[i] = resp.json()['data']['cppReport']
-    print(urls)
 
 
 @noj.command()

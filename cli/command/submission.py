@@ -8,8 +8,10 @@ from typing import (
     Tuple,
     Optional,
 )
+from tqdm import tqdm
 from cli.core import Submission
 from cli.core.submission import LanguageType
+from cli.core import submission as submission_lib
 
 __all__ = ('submission', )
 
@@ -67,7 +69,7 @@ def get(id):
 def get_list(
     pid: Tuple[int],
     output: Optional[pathlib.Path],
-    field: Tuple[int],
+    field: Tuple[str],
     before: Optional[str],
     tag: Tuple[str],
     course: Optional[str],
@@ -78,21 +80,21 @@ def get_list(
     if len(pid) == 0 and len(tag) == 0:
         print('Either pid or tag must be given')
         exit(1)
-    if before is not None:
-        before = datetime.fromisoformat(before)
 
-    def _filter(s: Submission):
+    def extract_fields(s: Submission):
         s = s.to_dict()
         return {f: s[f] for f in field}
 
-    _submission_filter = partial(
+    if before is not None:
+        before = datetime.fromisoformat(before)
+    shared_filter = partial(
         Submission.filter,
         course=course,
         before=before,
     )
     submission_filter = lambda *args, **ks: map(
-        _filter,
-        _submission_filter(*args, **ks),
+        extract_fields,
+        shared_filter(*args, **ks),
     )
 
     submissions = []
@@ -151,3 +153,67 @@ def submit(
     )
     if result == False:
         exit(1)
+
+
+@submission.command()
+@click.option('--pid', type=int, required=True)
+@click.option(
+    '-o',
+    '--output',
+    type=click.Path(
+        writable=True,
+        path_type=pathlib.Path,
+        dir_okay=True,
+        file_okay=False,
+    ),
+    default=None,
+    help='Output directory. Default to problem id.',
+)
+@click.option(
+    '--before',
+    help='Download code only submitted before specific time. (ISO format)',
+)
+@click.option(
+    '--after',
+    help='Download code only submitted after specific time. (ISO format)',
+)
+def get_problem_code(
+    pid: int,
+    output: Optional[pathlib.Path],
+    before: Optional[str],
+    after: Optional[str],
+):
+    '''
+    Download all source code of a problem
+    '''
+    if output is None:
+        output = pathlib.Path(str(pid))
+        if output.exists():
+            print(f'The output directory {output} has been created.')
+            exit(1)
+        output.mkdir()
+    else:
+        output.mkdir(exist_ok=True)
+    if before is not None:
+        before = datetime.fromisoformat(before)
+    if after is not None:
+        after = datetime.fromisoformat(after)
+    query_params = {
+        k: v
+        for k, v in dict(
+            problem_id=pid,
+            before=before,
+            after=after,
+        ).items() if v is not None
+    }
+    submissions = Submission.filter(**query_params)
+    print(f'Found {len(submissions)} submissions.')
+    print('Start downloading code.')
+    for submission in tqdm(submissions):
+        # Reload for code
+        submission = Submission.get_by_id(submission.id)
+        user_dir = output / submission.user.username
+        user_dir.mkdir(exist_ok=True)
+        main_filename = submission_lib.filename(submission.language_type)
+        main_filename = f'{submission.id}{pathlib.Path(main_filename).suffix}'
+        (user_dir / main_filename).write_text(submission.code)
