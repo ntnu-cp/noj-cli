@@ -1,0 +1,7 @@
+{
+    "default": {
+        "username": "<YOUR USERNAME HERE>",
+        "password": "<YOUR PASSOWRD HERE>",
+        "api_base": "https://api.of.you.noj.instance"
+    }
+}
