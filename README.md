@@ -35,3 +35,19 @@ poetry run python -m cli grade --homework "<Course name>/<Homework name>"
 ```bash
 poetry run python -m cli rejudge -p "<pid>"
 ```
+
+### Find out users who submit at least once
+
+```bash
+poetry run python -m cli submission get-list \
+    --tag hw2 \
+    --course 111-Computer-Programming-I \
+    --before 2022-09-20T12:01 \
+    -f user
+```
+
+and generate csv from above output
+
+```bash
+jq -r '[.[].user | .username] | unique | .[] | "\(.),100"' submission.json 
+```
