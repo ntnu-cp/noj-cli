@@ -124,6 +124,7 @@ class Submission:
         before: Optional[datetime] = None,
         user: Optional[Union[str, User]] = None,
         after: Optional[datetime] = None,
+        status: Optional[int] = None,
     ) -> List['Submission']:
         '''
         Get submission by parameter
@@ -136,6 +137,8 @@ class Submission:
             params['course'] = course
         if problem_id is not None:
             params['problemId'] = problem_id
+        if status is not None:
+            params['status'] = status
         if user is not None:
             if isinstance(user, str):
                 params['username'] = user

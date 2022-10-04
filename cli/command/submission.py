@@ -52,7 +52,6 @@ def get(id):
 @click.option(
     '-o',
     '--output',
-    # FIXME: the writable check seems to not working
     type=click.Path(writable=True, path_type=pathlib.Path),
     default=None,
 )
@@ -61,6 +60,11 @@ def get(id):
     '--field',
     default=['id'],
     multiple=True,
+)
+@click.option(
+    '--status',
+    type=int,
+    help='Submission status. e.g. 0 is AC.',
 )
 @click.option(
     '-b',
@@ -73,6 +77,7 @@ def get_list(
     before: Optional[str],
     tag: Tuple[str],
     course: Optional[str],
+    status: Optional[int],
 ):
     '''
     Get submission list
@@ -91,6 +96,7 @@ def get_list(
         Submission.filter,
         course=course,
         before=before,
+        status=status,
     )
     submission_filter = lambda *args, **ks: map(
         extract_fields,
