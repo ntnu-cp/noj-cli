@@ -5,6 +5,7 @@ from .ip_filter import ip_filter
 from .user import user
 from .homework import homework
 from .copycat import copycat
+from .problem import problem
 
 
 @click.group()
@@ -27,6 +28,7 @@ sub_commands = (
     user,
     homework,
     copycat,
+    problem,
 )
 for cmd in sub_commands:
     noj.add_command(cmd)

@@ -1,14 +1,24 @@
-from typing import List
+import logging
+from typing import List, Optional, Union
 from .auth import logined_session
 from .config import Config
+from .course import Course
 
 
 class Problem:
 
     def __init__(self, **ks) -> None:
-        self.problem_id = ks['problemId']
-        self.problem_name = ks['problemName']
+        self.id = ks['problemId']
+        self.name = ks['problemName']
         self.status = ks['status']
+
+    @classmethod
+    def get_by_id(cls, pid: int):
+        with logined_session() as sess:
+            resp = sess.get(f'{Config.API_BASE}/problem/{pid}')
+            assert resp.ok, resp.text
+            payload = resp.json()['data']
+        return cls(**payload, problemId=pid)
 
     @classmethod
     def filter(
@@ -27,3 +37,20 @@ class Problem:
             )
             problems = resp.json()['data']
         return [*map(lambda p: cls(**p), problems)]
+
+    def copy(
+        self,
+        target: Optional[Union[str, Course]] = None,
+    ) -> int:
+        payload = {
+            'problemId': self.id,
+            'target': target,
+        }
+        logging.debug(f'payload {payload}')
+        with logined_session() as sess:
+            resp = sess.post(
+                f'{Config.API_BASE}/problem/copy',
+                json=payload,
+            )
+            assert resp.ok, resp.text
+        return resp.json()['data']['problemId']
