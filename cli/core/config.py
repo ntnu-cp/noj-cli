@@ -7,16 +7,16 @@ from .context import Context
 
 class Config:
     CONTEXT = 'default'
-    API_BASE = 'https://noj.tw/api'
+    API_BASE = 'https://api.noj.tw/'
     curr_user = None
 
     @classmethod
     def default_context(cls):
-        return {'api_base': 'https://noj.tw/api'}
+        return {'api_base': 'https://api.noj.tw/'}
 
     @classmethod
     def config_path(cls) -> Path:
-        config_root = os.getenv('NOJ_CONFIG_DIR', '.noj')
+        config_root = os.getenv('NOJ_HOME', Path.home() / '.noj')
         config_root = Path(config_root)
         config_root.mkdir(exist_ok=True)
         if not config_root.is_dir():
